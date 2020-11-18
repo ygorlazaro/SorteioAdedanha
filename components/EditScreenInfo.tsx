@@ -1,108 +1,77 @@
-import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-
-import Colors from '../constants/Colors';
-import { MonoText } from './StyledText';
-import { Text, View } from './Themed';
-
-export default function EditScreenInfo({ path }: { path: string }) {
-  return (
-    <View>
-      <View style={styles.getStartedContainer}>
-        <Text
-          style={styles.getStartedText}
-          lightColor="rgba(0,0,0,0.8)"
-          darkColor="rgba(255,255,255,0.8)">
-          Open up the code for this screen:
-        </Text>
-
-        <View
-          style={[styles.codeHighlightContainer, styles.homeScreenFilename]}
-          darkColor="rgba(255,255,255,0.05)"
-          lightColor="rgba(0,0,0,0.05)">
-          <MonoText>{path}</MonoText>
-        </View>
-
-        <Text
-          style={styles.getStartedText}
-          lightColor="rgba(0,0,0,0.8)"
-          darkColor="rgba(255,255,255,0.8)">
-          Change any of the text, save the file, and your app will automatically update.
-        </Text>
-      </View>
-
-      <View style={styles.helpContainer}>
-        <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-          <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
-            Tap here if your app doesn't automatically update after making changes
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
-
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/get-started/create-a-new-app/#opening-the-app-on-your-phonetablet'
-  );
-}
+import { Button, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from './Themed';
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+  flex: { 
+    justifyContent: 'center',
+    flex:1
   },
-  developmentModeText: {
-    marginBottom: 20,
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
+    item: {
+    backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
   },
-  contentContainer: {
-    paddingTop: 30,
+  title: {
+    fontSize: 32,
   },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  helpContainer: {
-    marginTop: 15,
-    marginHorizontal: 20,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    textAlign: 'center',
-  },
-});
+  horizontal: {
+    flex:1,
+    flexDirection: 'row'
+  }
+})
+
+const LetraAnterior =({value: item}: any) => 
+    <Text>{item}</Text>
+
+export default class EditScreenInfo extends React.Component {
+    state = {
+      ultimaLetraSorteada: '',
+      letrasAnteriores: [''], 
+      disableButton: false
+    }
+
+    sortearLetra = () => {
+      const {letrasAnteriores} = this.state;
+      let letra = '';
+      do { 
+        letra = String.fromCharCode(Math.ceil( Math.random() * 26)+64)
+      }
+      while(letrasAnteriores.some(letraAnterior => letraAnterior === letra));
+
+      letrasAnteriores.push(letra)
+
+      this.setState({
+        ultimaLetraSorteada:letra,
+        letrasAnteriores
+      }, () => {
+        if (letrasAnteriores.length === 26){
+          this.setState({
+            disableButton: true
+          })
+        }
+      })
+    }
+
+    render(){
+
+      const { ultimaLetraSorteada, letrasAnteriores, disableButton} = this.state;
+      
+      return <ScrollView contentContainerStyle={styles.flex}>
+
+        <View style={styles.item}>
+          <Text>Letra sorteada</Text>
+          <Text style={styles.title}>{ultimaLetraSorteada}</Text>
+        </View>
+        
+        <View style={styles.horizontal}>
+          {letrasAnteriores.map(letraAnterior => <LetraAnterior value={letraAnterior} />)}
+        </View>
+
+        <Button disabled={disableButton} title="Sortear outra letra" onPress={() => this.sortearLetra()}></Button>
+
+
+      </ScrollView>
+    }
+}
